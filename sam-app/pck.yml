@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'sam-app
+
+  Sample SAM Template for sam-app
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://first-sam-project-muawizfarooqi/678e462ebcdea23a87b1a53441d86b3e
+      Handler: app.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+      - x86_64
+      Events:
+        HelloWorldAPI:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+    Metadata:
+      SamResourceId: HelloWorldFunction
+  ClockFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://first-sam-project-muawizfarooqi/68744e042301c4099107f071c1aaa78e
+      Handler: handler.clock
+      Runtime: nodejs18.x
+      Events:
+        ClockAPI:
+          Type: Api
+          Properties:
+            Path: /clock
+            Method: get
+    Metadata:
+      SamResourceId: ClockFunction
+  ConvertTimeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://first-sam-project-muawizfarooqi/68493b83f49eadc202e9ef1a868d1efa
+      Handler: handler.convertTime
+      Runtime: nodejs18.x
+      Events:
+        ConvertTimeAPI:
+          Type: Api
+          Properties:
+            Path: /convert-time
+            Method: get
+    Metadata:
+      SamResourceId: ConvertTimeFunction
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+    Metadata:
+      SamResourceId: ApplicationResourceGroup
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+    Metadata:
+      SamResourceId: ApplicationInsightsMonitoring
+Outputs:
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunctionRole
+      - Arn

@@ -1,0 +1,4 @@
+bucket: first-sam-project-muawizfarooqi
+outputfile: pck.yml
+region: us-east-2
+stackname: first-sam-project
